@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 
-/**
- *
- * @author Adm
- */
-
+import com.mysql.cj.Query;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,6 +7,8 @@ import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+
 
 
 public class ProdutosDAO {
@@ -33,7 +27,7 @@ public class ProdutosDAO {
             System.out.println("Erro ao conectar: " + ex.getMessage());
             return false;
         }
-    }
+    }  
     
     /**
      * método para salvar os produtos do formulário
@@ -90,20 +84,35 @@ public class ProdutosDAO {
     }
     
     public void cadastrarProduto (Produtos produto){
-        
-        
+         
         //conn = new conectaDAO().connectDB();
-        
         
     }
     
     public ArrayList<Produtos> listarProdutos(){
-        
-        return listagem;
+    listagem.clear(); // Limpa a lista para evitar duplicatas
+
+    try {
+        String sql = "SELECT * FROM produtos";
+        PreparedStatement stmt = this.conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Produtos produto = new Produtos();
+            produto.setId(rs.getInt("id"));
+            produto.setNome(rs.getString("nome"));
+            produto.setValor(rs.getInt("valor"));
+            produto.setStatus(rs.getString("status"));
+            // Defina os demais atributos conforme necessário
+
+            listagem.add(produto);
+        }
+    } catch (SQLException e) {
+        System.out.println("Erro ao listar produtos: " + e.getMessage());
     }
-    
-    
-    
-        
+
+    return listagem;
+}
+       
 }
 
