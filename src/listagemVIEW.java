@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class listagemVIEW extends javax.swing.JFrame {
@@ -8,6 +9,7 @@ public class listagemVIEW extends javax.swing.JFrame {
     public listagemVIEW() {
         initComponents();
         listarProdutos();
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -120,13 +122,41 @@ public class listagemVIEW extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVenderActionPerformed
-        String id = id_produto_venda.getText();
+                                                  
+    String id = id_produto_venda.getText();
+
+    if (!id.isEmpty()) {
+        int produtoId = Integer.parseInt(id);
         
         ProdutosDAO produtosdao = new ProdutosDAO();
         
-        //produtosdao.venderProduto(Integer.parseInt(id));
-        listarProdutos();
-        
+        // Chame o método conectar() para estabelecer a conexão
+        if (produtosdao.conectar()) {
+            // A conexão foi estabelecida com sucesso, agora chame venderProduto()
+            int status = produtosdao.venderProduto(produtoId);
+
+            if (status > 0) {
+                // A venda foi bem-sucedida, agora liste os produtos novamente
+                listarProdutos();
+            } else if (status == 0) {
+                // Produto não encontrado com o ID especificado
+                JOptionPane.showMessageDialog(this, "Produto não encontrado com o ID especificado.");
+            } else {
+                // Trate outros casos de erro, se necessário
+                JOptionPane.showMessageDialog(this, "Erro ao vender o produto.");
+            }
+
+            // Após concluir as operações, desconecte a conexão
+            produtosdao.desconectar();
+        } else {
+            // Lida com a falha na conexão
+            JOptionPane.showMessageDialog(this, "Falha na conexão com o banco de dados.");
+        }
+    } else {
+        // Lida com o caso em que o campo de ID está vazio
+        JOptionPane.showMessageDialog(this, "Informe o ID do produto a ser vendido.");
+    }
+
     }//GEN-LAST:event_btnVenderActionPerformed
 
     private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
@@ -160,7 +190,7 @@ public class listagemVIEW extends javax.swing.JFrame {
             model.setNumRows(0);
             
             ArrayList<Produtos> listagem = produtosDAO.listarProdutos();
-            System.out.println("quantidade: " + listagem.size());
+            //System.out.println("quantidade: " + listagem.size());
             
             for(int i = 0; i < listagem.size(); i++){
                 model.addRow(new Object[]{

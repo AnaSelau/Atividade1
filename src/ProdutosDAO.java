@@ -113,6 +113,35 @@ public class ProdutosDAO {
 
     return listagem;
 }
+    
+    public int venderProduto(int id) {
+    try {
+        // Primeiro, verifique se o produto com o ID especificado existe
+        String selectSql = "SELECT * FROM produtos WHERE id = ?";
+        PreparedStatement selectStmt = conn.prepareStatement(selectSql);
+        selectStmt.setInt(1, id);
+        ResultSet rs = selectStmt.executeQuery();
+
+        if (rs.next()) {
+            // Produto encontrado, atualize o status para "Vendido"
+            String updateSql = "UPDATE produtos SET status = ? WHERE id = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+            updateStmt.setString(1, "Vendido");
+            updateStmt.setInt(2, id);
+            
+            int status = updateStmt.executeUpdate();
+
+            return status; // Retorne o número de linhas afetadas pela atualização (deve ser 1 se bem-sucedido)
+        } else {
+            // Produto não encontrado com o ID especificado
+            return 0; // Ou outra forma de indicar que o produto não foi encontrado
+        }
+    } catch (SQLException e) {
+        System.out.println("Erro ao vender produto: " + e.getMessage());
+        return -1; // Ou outra forma de indicar erro
+    }
+}
+
        
 }
 
