@@ -113,6 +113,61 @@ public class ProdutosDAO {
 
     return listagem;
 }
+    
+    public ArrayList<Produtos> listarProdutosVendidos() {
+    listagem.clear(); // Limpa a lista para evitar duplicatas
+
+    try {
+        String sql = "SELECT * FROM produtos WHERE status = 'Vendido'";
+        PreparedStatement stmt = this.conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Produtos produto = new Produtos();
+            produto.setId(rs.getInt("id"));
+            produto.setNome(rs.getString("nome"));
+            produto.setValor(rs.getInt("valor"));
+            produto.setStatus(rs.getString("status"));
+            // Defina os demais atributos conforme necessário
+
+            listagem.add(produto);
+        }
+    } catch (SQLException e) {
+        System.out.println("Erro ao listar produtos vendidos: " + e.getMessage());
+    }
+
+    return listagem;
+}
+
+    
+    public int venderProduto(int id) {
+    try {
+        // Primeiro, verifique se o produto com o ID especificado existe
+        String selectSql = "SELECT * FROM produtos WHERE id = ?";
+        PreparedStatement selectStmt = conn.prepareStatement(selectSql);
+        selectStmt.setInt(1, id);
+        ResultSet rs = selectStmt.executeQuery();
+
+        if (rs.next()) {
+            // Produto encontrado, atualize o status para "Vendido"
+            String updateSql = "UPDATE produtos SET status = ? WHERE id = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+            updateStmt.setString(1, "Vendido");
+            updateStmt.setInt(2, id);
+            
+            int status = updateStmt.executeUpdate();
+
+            return status; // Retorne o número de linhas afetadas pela atualização (deve ser 1 se bem-sucedido)
+        } else {
+            // Produto não encontrado com o ID especificado
+            return 0; // Ou outra forma de indicar que o produto não foi encontrado
+        }
+    } catch (SQLException e) {
+        System.out.println("Erro ao vender produto: " + e.getMessage());
+        return -1; // Ou outra forma de indicar erro
+    }
+}
+
        
 }
 
