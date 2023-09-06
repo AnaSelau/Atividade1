@@ -114,6 +114,32 @@ public class ProdutosDAO {
     return listagem;
 }
     
+    public ArrayList<Produtos> listarProdutosVendidos() {
+    listagem.clear(); // Limpa a lista para evitar duplicatas
+
+    try {
+        String sql = "SELECT * FROM produtos WHERE status = 'Vendido'";
+        PreparedStatement stmt = this.conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Produtos produto = new Produtos();
+            produto.setId(rs.getInt("id"));
+            produto.setNome(rs.getString("nome"));
+            produto.setValor(rs.getInt("valor"));
+            produto.setStatus(rs.getString("status"));
+            // Defina os demais atributos conforme necessário
+
+            listagem.add(produto);
+        }
+    } catch (SQLException e) {
+        System.out.println("Erro ao listar produtos vendidos: " + e.getMessage());
+    }
+
+    return listagem;
+}
+
+    
     public int venderProduto(int id) {
     try {
         // Primeiro, verifique se o produto com o ID especificado existe
